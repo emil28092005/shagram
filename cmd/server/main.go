@@ -22,5 +22,9 @@ func main() {
 	router.GET("/api/rooms", func(c *gin.Context) {
 		c.JSON(200, gin.H{"rooms": "TODO"})
 	})
+	router.Static("/static", "./static")
+	router.GET("/", func(c *gin.Context) {
+		c.File("./static/index.html")
+	})
 	router.Run(":8080")
 }
