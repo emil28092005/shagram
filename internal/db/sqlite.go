@@ -17,7 +17,7 @@ func NewDB(path string) (*DB, error) {
 		return nil, err
 	}
 
-	schema, err := os.ReadFile("../../migrations/schema.sql")
+	schema, err := os.ReadFile("migrations/schema.sql")
 	if err != nil {
 		return nil, err
 	}

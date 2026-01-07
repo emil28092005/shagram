@@ -3,8 +3,8 @@ package websocket
 import "github.com/gorilla/websocket"
 
 type Client struct {
-	conn *websocket.Conn
-	room *Room
+	Conn *websocket.Conn
+	Room *Room
 }
 
 type Room struct {
@@ -25,12 +25,12 @@ func (r *Room) Register(client *Client) {
 
 func (r *Room) Unregister(client *Client) {
 	delete(r.clients, client)
-	client.conn.Close()
+	client.Conn.Close()
 }
 
 func (r *Room) Broadcast(message []byte) {
 	for client := range r.clients {
-		err := client.conn.WriteMessage(websocket.TextMessage, message)
+		err := client.Conn.WriteMessage(websocket.TextMessage, message)
 		if err != nil {
 			r.Unregister(client)
 		}
