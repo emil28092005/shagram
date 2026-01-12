@@ -1,16 +1,71 @@
 let ws = null;
 const messagesDiv = document.getElementById('messages');
 const messageInput = document.getElementById('messageInput');
-const roomInput = document.getElementById('roomInput');
+const roomSelect = document.getElementById('roomSelect');
+
+function loadRooms() {
+    fetch('/api/rooms')
+    .then(response => response.json())
+    .then(data => {
+        roomSelect.innerHTML = '';
+        data.rooms.forEach(room => {
+            const option = document.createElement('option');
+            option.value = room;
+            option.textContent = room;
+            roomSelect.appendChild(option);
+        });
+    })
+    .catch(error => {
+        console.error('Error loading rooms:', error);
+    })
+}
 
 function connectRoom() {
-    const room = roomInput.value || 'general';
+    const room = roomSelect.value || 'general';
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    
+    if (ws) {
+        ws.close();
+    }
+
     ws = new WebSocket(`${protocol}//localhost:8080/ws/${room}`);
 
+    
+
     ws.onopen = function() {
-        console.log('Connected to room: ' + room);
-        messagesDiv.innerHTML = '<div class="message">✅ Connected to ' + room + '</div>';
+        console.log('WebSocket connected, loading history for', room);
+
+        fetch(`/api/messages/${room}`)
+            .then(response => {
+                console.log('API response:', response.status);
+                return response.json()
+            })
+            .then(data => {
+                console.log('History data:', data);
+                messagesDiv.innerHTML = '';
+                const history = data.messages || [];
+                console.log('history length:', history.length);
+                if (history.length > 0) {
+                    history.reverse().forEach((msg, index) => {
+                        console.log(`Message ${index}:`, msg)
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = 'message';
+                        msgDiv.textContent = `${msg.user}: ${msg.text}`;
+                        messagesDiv.appendChild(msgDiv);
+                    })
+                }
+                const connectMsg = document.createElement('div');
+                connectMsg.className = 'message';
+                connectMsg.textContent = `✅ Connected to ${room}`;
+                messagesDiv.appendChild(connectMsg);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                console.log('History loaded!');
+            })
+            .catch(error => {
+                console.error('❌ History error', error);
+            })
+
+        
     };
 
     ws.onmessage = function(event) {
@@ -27,7 +82,7 @@ function connectRoom() {
     };
 
     ws.onclose = function() {
-        messagesDiv.innerHTML += '<div class="meassage">⛔ Disconnected</div>';
+        messagesDiv.innerHTML += '<div class="message">⛔ Disconnected</div>';
     };
 }
 
@@ -41,3 +96,5 @@ function sendMessage() {
     ws.send(JSON.stringify({text: text}));
     messageInput.value = '';
 }
+
+loadRooms();
