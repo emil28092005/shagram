@@ -23,3 +23,11 @@ func (h *Hub) CleanupRoom(roomID string) {
 		delete(h.rooms, roomID)
 	}
 }
+
+func (h *Hub) Rooms() []string {
+	ids := make([]string, 0, len(h.rooms))
+	for id := range h.rooms {
+		ids = append(ids, id)
+	}
+	return ids
+}
