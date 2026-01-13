@@ -88,12 +88,18 @@ function connectRoom() {
 
 function sendMessage() {
     const text = messageInput.value.trim();
+    const usernameInput = document.getElementById('userInput');
+    const username = usernameInput ? usernameInput.value.trim() || 'Anonymous' : 'Anonymous';
+
     if (!text || !ws || ws.readyState !== WebSocket.OPEN) {
         alert('Not connected or empty message');
         return;
     }
     
-    ws.send(JSON.stringify({text: text}));
+    ws.send(JSON.stringify({
+        text: text,
+        user: username,
+        }));
     messageInput.value = '';
 }
 

@@ -21,21 +21,22 @@
         }
         input { padding: 8px; width: 300px; }
         button { padding: 8px 15px; cursor: pointer; }
-        select { padding: 8px; width: 320px; }  /* ← для комнат */
+        select { padding: 8px; width: 320px; }
         #roomsList { margin: 10px 0; }
     </style>
 </head>
 <body>
     <h1>📱 Shagram Chat</h1>
     
-    <!-- ← НОВЫЙ БЛОК С КОМНАТАМИ -->
     <div id="roomsList">
         <select id="roomSelect">
             <option value="general">general</option>
         </select>
-        <button onclick="loadRooms()">🔄 Refresh</button>
+        <input type="text" id="userInput" placeholder="Your name" value="Эмиль" maxlength="20">
+        <button onclick="loadRooms()">🔄</button>
         <button onclick="connectRoom()">Connect</button>
     </div>
+
     
     <div id="messages"></div>
     

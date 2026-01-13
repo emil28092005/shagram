@@ -39,14 +39,18 @@ func WebSocketHandler(hub *websocket.Hub, database *db.DB) gin.HandlerFunc {
 				if err != nil {
 					break
 				}
+				user := msg["user"]
+				if user == "" {
+					user = "Anonymous"
+				}
 				_, err = database.Exec(`
 					INSERT INTO messages (room_id, user, text)
-					VALUES (?, ?, ?)`, roomID, "user", msg["text"])
+					VALUES (?, ?, ?)`, roomID, user, msg["text"])
 				if err != nil {
 					log.Printf("Save message error: %v", err)
 				}
-
-				message := []byte(msg["text"])
+				formattedMsg := user + ": " + msg["text"]
+				message := []byte(formattedMsg)
 				room.Broadcast(message)
 			}
 		}()
