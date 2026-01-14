@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  shagram:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+      - ./static:/app/static
+      - ./migrations:/app/migrations
+    environment:
+      - DATABASE_PATH=/app/shagram.db
+    container_name: shagram-app
