@@ -1,0 +1,13 @@
+.git
+.gitignore
+README.md
+*.db
+*.sqlite
+shagram.db
+project_context.txt
+.vscode
+.idea
+*.log
+.env
+docker-compose.yml
+Dockerfile

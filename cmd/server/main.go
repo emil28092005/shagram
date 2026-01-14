@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	database, err := db.NewDB("shagram.db")
+	database, err := db.NewDB("/app/data/shagram.db")
 	if err != nil {
 		log.Fatal(err)
 	}
