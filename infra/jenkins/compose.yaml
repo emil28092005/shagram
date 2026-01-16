@@ -1,0 +1,31 @@
+services:
+  jenkins-controller:
+    image: jenkins/jenkins:lts-jdk17
+    container_name: jenkins-controller
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    restart: unless-stopped
+  
+  jenkins-agent-docker:
+    image: jenkins/inbound-agent:latest-jdk17
+    container_name: jenkins-agent-docker
+    environment:
+      - JENKINS_URL=http://jenkins-controller:8080
+      - JENKINS_AGENT_NAME=docker-agent
+      - JENKINS_SECRET=__PASTE_ME__
+      - AGENT_WORKDIR=/home/jenkins/agent
+    volumes:
+      - agent_workdir:/home/jenkins/agent
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+      - /usr/libexec/docker/cli-plugins:/usr/libexec/docker/cli-plugins:ro
+      - /opt/shagram:/opt/shagram
+    restart: unless-stopped
+    depends_on:
+      - jenkins-controller
+
+volumes:
+  jenkins_home:
+  agent_workdir:

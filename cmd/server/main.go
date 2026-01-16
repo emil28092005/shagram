@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"shagram/internal/api"
 	"shagram/internal/db"
 	"shagram/internal/models"
@@ -12,7 +13,11 @@ import (
 )
 
 func main() {
-	database, err := db.NewDB("/app/data/shagram.db")
+	dbPath := os.Getenv("DATABASE_PATH")
+	if dbPath == "" {
+		dbPath = "/app/data/shagram.db"
+	}
+	database, err := db.NewDB(dbPath)
 	if err != nil {
 		log.Fatal(err)
 	}

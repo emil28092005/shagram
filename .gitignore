@@ -1,2 +1,4 @@
 project_context.txt
 shagram.db
+deploy/shagram/nginx/certs/*.pem
+deploy/shagram/.env

@@ -1,0 +1,24 @@
+services:
+  shagram:
+    image: ${APP_IMAGE}
+    container_name: shagram-app
+    environment:
+      - DATABASE_PATH=/app/data/shagram.db
+    volumes:
+      - shagram_data:/app/data
+    expose:
+      - "8080"
+  
+  nginx:
+    image: nginx:alpine
+    container_name: shagram-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - shagram
+volumes:
+  shagram_data:
