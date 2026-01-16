@@ -2,6 +2,12 @@ pipeline{
     agent any
     stages{
         stage('Build') {
+            agent {
+                docker {
+                    image 'docker:27-dind'
+                    args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
                 echo 'Building shagram...'
                 sh 'docker build -t shagram-shagram:latest .'
