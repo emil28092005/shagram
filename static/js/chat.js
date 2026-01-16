@@ -23,12 +23,12 @@ function loadRooms() {
 function connectRoom() {
     const room = roomSelect.value || 'general';
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    
+    const host = window.location.host;    
     if (ws) {
         ws.close();
     }
-
-    ws = new WebSocket(`${protocol}//localhost:8080/ws/${room}`);
+    const wsUrl = `${protocol}//${host}/ws/${room}`;
+    ws = new WebSocket(wsUrl);
 
     
 
