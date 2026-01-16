@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   jenkins:
     image: jenkins/jenkins:lts-jdk17
@@ -8,7 +10,11 @@ services:
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
       - /opt/shagram:/workspace
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    user: root
     restart: unless-stopped
 
 volumes:
