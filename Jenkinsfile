@@ -1,6 +1,6 @@
 pipeline{
     agent{
-        label any
+        label { label 'jenkins'}
     }
     stages{
         stage('Build') {
