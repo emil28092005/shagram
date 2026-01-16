@@ -1,6 +1,11 @@
 pipeline{
     agent any
     stages{
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/emil28092005/shagram.git', branch: 'main'
+            }
+        }
         stage('Build') {
             steps {
                 echo 'Building shagram...'
