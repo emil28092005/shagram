@@ -4,14 +4,13 @@ pipeline{
         skipDefaultCheckout()
     }
     environment {
-        SRC_DIR = "/opt/shagram/src/shagram"
-        DEPLOY_DIR = "/opt/shagram/deploy/shagram"
+        PROJECT_DIR = "/opt/shagram/shagram"
         IMAGE_NAME = "shagram"
     }
     stages{
         stage('Checkout') {
             steps {
-                dir(env.SRC_DIR) {
+                dir(env.PROJECT_DIR) {
                     deleteDir()
                     git url: 'https://github.com/emil28092005/shagram.git', branch: 'main'
                 }
@@ -19,7 +18,7 @@ pipeline{
         }
         stage('Build') {
             steps {
-                dir(env.SRC_DIR) { 
+                dir(env.PROJECT_DIR) { 
                     echo 'Building shagram...'
                     sh 'docker build -t ${IMAGE_NAME}:${GIT_COMMIT} .'
 
@@ -34,7 +33,7 @@ pipeline{
         }
         stage('Deploy') {
             steps {
-                dir(env.DEPLOY_DIR) {
+                dir("${PROJECT_DIR}/deploy/shagram") {
                     echo 'Deploying...'
                     sh 'printf "APP_IMAGE=%s\\n" "${IMAGE_NAME}:${GIT_COMMIT}" > .env'
                     sh 'docker compose up -d'
