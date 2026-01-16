@@ -3,6 +3,7 @@ pipeline{
     stages{
         stage('Checkout') {
             steps {
+                deleteDir()
                 git url: 'https://github.com/emil28092005/shagram.git', branch: 'main'
             }
         }
@@ -22,9 +23,9 @@ pipeline{
             steps {
                 echo 'Deploying...'
                 sh '''
-                    docker-compose down || true
-                    docker-compose up -d
-                    docker-compose ps
+                    docker compose down || true
+                    docker compose up -d
+                    docker compose ps
                 '''
             }
         }
