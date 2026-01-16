@@ -1,6 +1,8 @@
 services:
   shagram:
-    image: ${APP_IMAGE}
+    image: ${APP_IMAGE:-shagram:local}
+    build: 
+      context: ../../src/shagram
     container_name: shagram-app
     environment:
       - DATABASE_PATH=/app/data/shagram.db
