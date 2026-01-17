@@ -14,7 +14,7 @@ services:
     environment:
       - JENKINS_URL=http://jenkins-controller:8080
       - JENKINS_AGENT_NAME=docker-agent
-      - JENKINS_SECRET=__PASTE_ME__
+      - JENKINS_SECRET=0c92dc0b807b3c7213cd2abcec4f88182aa8f4fb2233ca9c674f17fd771fe662
       - AGENT_WORKDIR=/home/jenkins/agent
     volumes:
       - agent_workdir:/home/jenkins/agent
@@ -28,4 +28,6 @@ services:
 
 volumes:
   jenkins_home:
+    external: true
+    name: jenkins_jenkins_home
   agent_workdir:
