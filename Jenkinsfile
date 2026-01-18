@@ -45,23 +45,28 @@ pipeline {
         '''
       }
     }
-
-    stage('Deploy') {
-        when {
-            beforeAgent true
-            branch 'main'
-        }
+    stage('Debug env') {
         steps {
             sh '''
-            set -eux
-            mkdir -p "$DEPLOY_DIR"
-            cat > "$DEPLOY_DIR/.env" <<EOF
-        APP_IMAGE=$APP_IMAGE
-        EOF
-            docker compose -f "$COMPOSE_FILE" --project-directory "$DEPLOY_DIR" up -d --remove-orphans
+            echo "BRANCH_NAME=$BRANCH_NAME"
+            echo "GIT_BRANCH=$GIT_BRANCH"
+            git rev-parse --abbrev-ref HEAD || true
+            git rev-parse HEAD
             '''
         }
     }
+
+
+    stage('Deploy') {
+    when {
+        expression { env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main' }
+    }
+    steps {
+        sh 'echo "deploying"'
+        sh 'touch /opt/shagram/TEST_WEBHOOK.txt'
+    }
+    }
+
 
   }
 }
