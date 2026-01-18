@@ -1,6 +1,10 @@
 pipeline {
-  agent { label 'docker' }
-  options { skipDefaultCheckout() }
+  agent { label 'docker-agent' }
+
+  options {
+    skipDefaultCheckout(true)
+    timestamps()
+  }
 
   environment {
     IMAGE_NAME   = "shagram"
@@ -11,44 +15,62 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        script {
-          deleteDir()
+        checkout scm
 
-          def scmVars = git url: 'https://github.com/emil28092005/shagram.git', branch: 'cicd-fix'
-          env.IMAGE_TAG = scmVars.GIT_COMMIT.take(7)
-        }
+        sh '''
+          set -eux
+          git reset --hard
+          git clean -xffd
+          git status --porcelain
+        '''
       }
     }
 
     stage('Build') {
       steps {
-        sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+        script {
+          def sha = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+          env.IMAGE_TAG = sha
+          env.APP_IMAGE = "${IMAGE_NAME}:${sha}"
+        }
+
+        sh '''
+          set -eux
+          docker version
+          docker build -t "$APP_IMAGE" .
+        '''
       }
     }
 
     stage('Test') {
       steps {
-        sh 'docker run --rm ${IMAGE_NAME}:${IMAGE_TAG} sqlite3 --version'
+        sh '''
+          set -eux
+          go test ./...
+        '''
       }
     }
 
     stage('Deploy') {
       steps {
         sh '''
-          set -e
-          printf "APP_IMAGE=%s\\n" "${IMAGE_NAME}:${IMAGE_TAG}" > "${DEPLOY_DIR}/.env"
+          set -eux
 
-          docker compose \
-            --project-directory "${DEPLOY_DIR}" \
-            -f "${COMPOSE_FILE}" \
-            up -d --build
+          mkdir -p "$DEPLOY_DIR"
+          cat > "$DEPLOY_DIR/.env" <<EOF
+APP_IMAGE=$APP_IMAGE
+EOF
 
-          docker compose \
-            --project-directory "${DEPLOY_DIR}" \
-            -f "${COMPOSE_FILE}" \
-            ps
+          docker compose -f "$COMPOSE_FILE" --project-directory "$DEPLOY_DIR" up -d --remove-orphans
+          docker compose -f "$COMPOSE_FILE" --project-directory "$DEPLOY_DIR" ps
         '''
       }
+    }
+  }
+
+  post {
+    always {
+      echo "Done"
     }
   }
 }

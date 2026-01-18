@@ -1,10 +1,15 @@
 FROM golang:1.25.5-alpine AS builder
 RUN apk add --no-cache build-base ca-certificates
 WORKDIR /app
+
 COPY go.mod go.sum ./
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
+
 COPY . .
-RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o shagram ./cmd/server
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=1 GOOS=linux go build -o shagram ./cmd/server
 
 FROM alpine:latest
 RUN apk add --no-cache ca-certificates sqlite-libs sqlite
