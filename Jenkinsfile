@@ -6,11 +6,12 @@ pipeline {
     timestamps()
   }
 
-  environment {
-    IMAGE_NAME   = "shagram"
-    DEPLOY_DIR   = "/opt/shagram/shagram/deploy/shagram"
-    COMPOSE_FILE = "/opt/shagram/shagram/deploy/shagram/compose.yaml"
-  }
+    environment {
+    IMAGE_NAME = "shagram"
+    DEPLOY_DIR = "/opt/shagram/shagram/deploy/shagram"
+    COMPOSE_FILE = "${WORKSPACE}/deploy/shagram/compose.yaml"
+    }
+
 
   stages {
     stage('Checkout') {
@@ -46,16 +47,21 @@ pipeline {
     }
 
     stage('Deploy') {
-      steps {
-        sh '''
-          set -eux
-          mkdir -p "$DEPLOY_DIR"
-          cat > "$DEPLOY_DIR/.env" <<EOF
-APP_IMAGE=$APP_IMAGE
-EOF
-          docker compose -f "$COMPOSE_FILE" --project-directory "$DEPLOY_DIR" up -d --remove-orphans
-        '''
-      }
+        when {
+            beforeAgent true
+            branch 'main'
+        }
+        steps {
+            sh '''
+            set -eux
+            mkdir -p "$DEPLOY_DIR"
+            cat > "$DEPLOY_DIR/.env" <<EOF
+        APP_IMAGE=$APP_IMAGE
+        EOF
+            docker compose -f "$COMPOSE_FILE" --project-directory "$DEPLOY_DIR" up -d --remove-orphans
+            '''
+        }
     }
+
   }
 }
