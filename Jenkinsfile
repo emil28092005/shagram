@@ -15,13 +15,15 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
+        sh '''
+          set -eux
+          rm -rf ./* ./.git || true
+        '''
         checkout scm
-
         sh '''
           set -eux
           git reset --hard
           git clean -xffd
-          git status --porcelain
         '''
       }
     }
