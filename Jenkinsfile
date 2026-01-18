@@ -7,7 +7,7 @@ pipeline {
   }
 
   environment {
-    REGISTRY     = "10.129.0.7:8085"
+    REGISTRY     = "158.160.92.116:8085"
     REGISTRY_PROJECT = "shagram"
     IMAGE_NAME   = "shagram"
     DEPLOY_DIR   = "/opt/shagram/shagram/deploy/shagram"
