@@ -11,6 +11,9 @@ services:
   jenkins-agent-docker:
     image: jenkins/inbound-agent:latest-jdk17
     container_name: jenkins-agent-docker
+    user: "1000:1000"
+    group_add:
+      - "988"
     environment:
       - JENKINS_URL=http://jenkins-controller:8080
       - JENKINS_AGENT_NAME=docker-agent
@@ -22,6 +25,7 @@ services:
       - /usr/bin/docker:/usr/bin/docker
       - /usr/libexec/docker/cli-plugins:/usr/libexec/docker/cli-plugins:ro
       - /opt/shagram:/opt/shagram
+
     restart: unless-stopped
     depends_on:
       - jenkins-controller

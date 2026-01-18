@@ -1,45 +1,61 @@
-pipeline{
-    agent { label 'docker' }
-    options {
-        skipDefaultCheckout()
-    }
-    environment {
-        PROJECT_DIR = "/opt/shagram/shagram"
-        IMAGE_NAME = "shagram"
-    }
-    stages{
-        stage('Checkout') {
-            steps {
-                dir(env.PROJECT_DIR) {
-                    deleteDir()
-                    git url: 'https://github.com/emil28092005/shagram.git', branch: 'main'
-                }
-            }
-        }
-        stage('Build') {
-            steps {
-                dir(env.PROJECT_DIR) { 
-                    echo 'Building shagram...'
-                    sh 'docker build -t ${IMAGE_NAME}:${GIT_COMMIT} .'
+pipeline {
+  agent { label 'docker-agent' }
 
-                }
-            }
-        }
-        stage('Test') {
-            steps {
-                echo 'Testing...'
-                sh 'docker run --rm ${IMAGE_NAME}:${GIT_COMMIT} sqlite3 --version'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                dir("${PROJECT_DIR}/deploy/shagram") {
-                    echo 'Deploying...'
-                    sh 'printf "APP_IMAGE=%s\\n" "${IMAGE_NAME}:${GIT_COMMIT}" > .env'
-                    sh 'docker compose up -d'
-                    sh 'docker compose ps'
-                }
-            }
-        }
+  options {
+    skipDefaultCheckout(true)
+    timestamps()
+  }
+
+  environment {
+    IMAGE_NAME   = "shagram"
+    DEPLOY_DIR   = "/opt/shagram/shagram/deploy/shagram"
+    COMPOSE_FILE = "/opt/shagram/shagram/deploy/shagram/compose.yaml"
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+        sh '''
+          set -eux
+          git reset --hard
+          git clean -xffd
+        '''
+      }
     }
+
+    stage('Build') {
+      steps {
+        script {
+          env.GIT_SHA = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+          env.APP_IMAGE = "${IMAGE_NAME}:${env.GIT_SHA}"
+        }
+        sh '''
+          set -eux
+          docker build -t "$APP_IMAGE" .
+        '''
+      }
+    }
+
+    stage('Test') {
+      steps {
+        sh '''
+          echo "Testing..."
+        '''
+      }
+    }
+
+    stage('Deploy') {
+      steps {
+        sh '''
+          set -eux
+          mkdir -p "$DEPLOY_DIR"
+          cat > "$DEPLOY_DIR/.env" <<EOF
+APP_IMAGE=$APP_IMAGE
+EOF
+          docker compose -f "$COMPOSE_FILE" --project-directory "$DEPLOY_DIR" up -d --remove-orphans
+        '''
+      }
+    }
+  }
 }
