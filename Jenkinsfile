@@ -38,8 +38,15 @@ pipeline {
     }
 
     stage('Test') {
+      agent {
+        docker { image 'golang:1.25.5-alpine' }
+      }
       steps {
-        sh 'set -eux; go test ./...'
+        sh '''
+          set -eux
+          go version
+          go test ./...
+        '''
       }
     }
 
