@@ -1,7 +1,7 @@
 services:
   shagram:
     image: ${APP_IMAGE:-shagram:local}
-    build: 
+    build:
       context: ../..
     container_name: shagram-app
     environment:
@@ -10,7 +10,7 @@ services:
       - shagram_data:/app/data
     expose:
       - "8080"
-  
+
   nginx:
     image: nginx:alpine
     container_name: shagram-nginx
