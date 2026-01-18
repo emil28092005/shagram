@@ -9,6 +9,7 @@ services:
     restart: unless-stopped
   
   jenkins-agent-docker:
+    user: "0:0"
     image: jenkins/inbound-agent:latest-jdk17
     container_name: jenkins-agent-docker
     environment:

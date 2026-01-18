@@ -15,10 +15,6 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        sh '''
-          set -eux
-          rm -rf ./* ./.git || true
-        '''
         checkout scm
         sh '''
           set -eux
@@ -31,14 +27,11 @@ pipeline {
     stage('Build') {
       steps {
         script {
-          def sha = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-          env.IMAGE_TAG = sha
-          env.APP_IMAGE = "${IMAGE_NAME}:${sha}"
+          env.GIT_SHA = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+          env.APP_IMAGE = "${IMAGE_NAME}:${env.GIT_SHA}"
         }
-
         sh '''
           set -eux
-          docker version
           docker build -t "$APP_IMAGE" .
         '''
       }
@@ -46,10 +39,7 @@ pipeline {
 
     stage('Test') {
       steps {
-        sh '''
-          set -eux
-          go test ./...
-        '''
+        sh 'set -eux; go test ./...'
       }
     }
 
@@ -57,22 +47,13 @@ pipeline {
       steps {
         sh '''
           set -eux
-
           mkdir -p "$DEPLOY_DIR"
           cat > "$DEPLOY_DIR/.env" <<EOF
 APP_IMAGE=$APP_IMAGE
 EOF
-
           docker compose -f "$COMPOSE_FILE" --project-directory "$DEPLOY_DIR" up -d --remove-orphans
-          docker compose -f "$COMPOSE_FILE" --project-directory "$DEPLOY_DIR" ps
         '''
       }
-    }
-  }
-
-  post {
-    always {
-      echo "Done"
     }
   }
 }
