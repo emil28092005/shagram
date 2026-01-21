@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"os"
 	"shagram/internal/api"
+	"shagram/internal/auth"
 	"shagram/internal/db"
 	"shagram/internal/models"
 	"shagram/internal/websocket"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,6 +31,27 @@ func main() {
 
 	router := gin.Default()
 
+	router.POST("/api/auth/login", func(c *gin.Context) {
+		var req struct {
+			Username string `json:"username"`
+		}
+		if err := c.ShouldBindJSON(&req); err != nil || req.Username == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "username required"})
+			return
+		}
+
+		token, err := auth.NewAccessToken(req.Username, time.Hour)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(200, gin.H{"access_token": token})
+	})
+	router.GET("/api/me", auth.Middleware(), func(c *gin.Context) {
+		username := c.GetString(auth.CtxUsernameKey)
+		c.JSON(200, gin.H{"username": username})
+	})
 	router.GET("/ws/:room", func(c *gin.Context) {
 		api.WebSocketHandler(hub, database)(c)
 	})

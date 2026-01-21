@@ -6,6 +6,7 @@ services:
     container_name: shagram-app
     environment:
       - DATABASE_PATH=/app/data/shagram.db
+      - JWT_SECRET=${JWT_SECRET}
     volumes:
       - shagram_data:/app/data
     expose:
