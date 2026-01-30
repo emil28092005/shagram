@@ -35,6 +35,11 @@ func WebSocketHandler(hub *websocket.Hub, database *db.DB) gin.HandlerFunc {
 		room := hub.GetOrCreateRoom(roomID)
 
 		tokenString := c.Query("token")
+		if tokenString == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "missing token"})
+			return
+		}
+
 		claims, err := auth.ParseAccessToken(tokenString)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
