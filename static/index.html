@@ -4,18 +4,18 @@
     <title>Shagram Chat</title>
     <style>
         body { font-family: Arial; margin: 20px; }
-        #messages { 
-            height: 300px; 
-            border: 1px solid #ccc; 
-            overflow-y: auto; 
-            padding: 10px; 
+        #messages {
+            height: 300px;
+            border: 1px solid #ccc;
+            overflow-y: auto;
+            padding: 10px;
             margin-bottom: 10px;
             background: #f9f9f9;
         }
-        .message { 
-            margin: 5px 0; 
-            padding: 8px; 
-            background: #e3f2fd; 
+        .message {
+            margin: 5px 0;
+            padding: 8px;
+            background: #e3f2fd;
             border-radius: 5px;
             border-left: 3px solid #2196F3;
         }
@@ -23,25 +23,29 @@
         button { padding: 8px 15px; cursor: pointer; }
         select { padding: 8px; width: 320px; }
         #roomsList { margin: 10px 0; }
+        #authStatus { margin-left: 10px; }
     </style>
 </head>
 <body>
     <h1>📱 Shagram Chat</h1>
-    
+
     <div id="roomsList">
         <select id="roomSelect">
             <option value="general">general</option>
         </select>
+
         <input type="text" id="userInput" placeholder="Your name" value="Эмиль" maxlength="20">
+        <button onclick="login()">Login</button>
+        <span id="authStatus"></span>
+
         <button onclick="loadRooms()">🔄</button>
         <button onclick="connectRoom()">Connect</button>
     </div>
 
-    
     <div id="messages"></div>
-    
+
     <div>
-        <input type="text" id="messageInput" placeholder="Type message..." 
+        <input type="text" id="messageInput" placeholder="Type message..."
                onkeypress="if(event.key==='Enter') sendMessage()">
         <button onclick="sendMessage()">Send</button>
     </div>
