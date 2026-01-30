@@ -5,7 +5,7 @@ services:
       context: ../..
     container_name: shagram-app
     environment:
-      - WS_ALLOWED_ORIGINS=https://localhost,http://localhost
+      - WS_ALLOWED_ORIGINS=${WS_ALLOWED_ORIGINS}
       - DATABASE_PATH=/app/data/shagram.db
       - JWT_SECRET=${JWT_SECRET}
     volumes:
