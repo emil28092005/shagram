@@ -6,6 +6,11 @@ This is primarily a **DevOps-focused pet project**: the app itself is intentiona
 
 > Public repo note: I intentionally do not publish any real server URLs, IP addresses, credentials, or registry endpoints here.
 
+## Documentation
+Detailed setup guides are kept in separate README files to avoid duplication:
+- Jenkins CI infrastructure (controller + inbound Docker agent): `infra/jenkins/README.md`
+- Nginx TLS certificates for dev/demo (self-signed): `deploy/shagram/nginx/certs/README.md`
+
 ## What it does
 - Multi-room chat via WebSockets (`/ws/:room`) with message broadcast.
 - Message history persisted in SQLite and available through an HTTP API.
