@@ -1,7 +1,7 @@
-```md
 # Shagram — Go WebSocket Chat | DevOps Pet Project
 
-Shagram is a small real-time chat application written in Go.  
+Shagram is a small real-time chat application written in Go.
+
 This is primarily a **DevOps-focused pet project**: the app itself is intentionally simple, while the main goal is to practice CI/CD, containerization, reverse proxy/TLS, and operating self-hosted infrastructure.
 
 > Public repo note: I intentionally do not publish any real server URLs, IP addresses, credentials, or registry endpoints here.
@@ -18,7 +18,7 @@ This is primarily a **DevOps-focused pet project**: the app itself is intentiona
 - Nginx: Reverse proxy configuration for HTTP + WebSocket (Upgrade/Connection headers) and TLS termination.
 - TLS: Self-signed certificates for dev/demo environments; production note to use a trusted CA (e.g., Let’s Encrypt).
 - CI/CD with Jenkins: Pipeline that builds a Docker image, tags it, pushes it to a registry, and deploys via Docker Compose (deploy gated to `main`).
-- GitHub → Jenkins automation: GitHub repository **webhook** triggers Jenkins builds on push/changes.
+- GitHub → Jenkins automation: GitHub repository webhook triggers Jenkins builds on push/changes.
 - Private registry (Harbor): Self-hosted registry for storing and distributing built images.
 - Jenkins agent architecture: Dedicated inbound Docker agent for builds, with Docker socket mounting for Docker-based workloads (security caveat applies).
 - Ops automation: One-command restart/update script (`restart-stacks.sh`) that pulls and recreates Shagram, Jenkins, and Harbor stacks.
@@ -29,14 +29,14 @@ This is primarily a **DevOps-focused pet project**: the app itself is intentiona
 ## Application stack
 - Go + Gin (HTTP API and routing) (`cmd/server`).
 - WebSockets: Gorilla WebSocket (`internal/api`, `internal/websocket`).
-- Auth: JWT access tokens (`internal/auth`), login endpoint issues tokens, and WebSocket uses `?token=...`.
+- Auth: JWT access tokens (`internal/auth`); login endpoint issues tokens; WebSocket uses `?token=...`.
 - Storage: SQLite (`internal/db`) initialized from `migrations/schema.sql`.
 
 ## Configuration
 Environment variables:
-- `JWT_SECRET` (required): signing key for JWT tokens.
-- `DATABASE_PATH` (optional): SQLite file path, defaults to `/app/data/shagram.db` in the container.
-- `WS_ALLOWED_ORIGINS` (required for WebSocket): comma-separated list of allowed `Origin` values for browser WebSocket connections.
+- `JWT_SECRET` (required): Signing key for JWT tokens.
+- `DATABASE_PATH` (optional): SQLite file path; defaults to `/app/data/shagram.db` in the container.
+- `WS_ALLOWED_ORIGINS` (required for WebSocket): Comma-separated list of allowed `Origin` values for browser WebSocket connections.
 - `APP_IMAGE` (optional, deployment): Docker image reference used by Compose to deploy a prebuilt image.
 
 ## HTTP API
@@ -85,18 +85,21 @@ Open:
 ## Quickstart (Docker Compose + Nginx TLS)
 Prerequisites: Docker + Docker Compose.
 
-1) Generate a self-signed TLS certificate (dev/demo only):
+1) Generate a self-signed TLS certificate (dev/demo only):  
 See `deploy/shagram/nginx/certs/README.md`.
 
 2) Create `deploy/shagram/.env`:
-```bash
+
+```text
 JWT_SECRET=change-me
 WS_ALLOWED_ORIGINS=https://localhost
-# Optional: override the app image (e.g., from your registry)
-# APP_IMAGE=<your-registry>/<project>/shagram:<tag>
+
+Optional: override the app image (e.g., from your registry)
+APP_IMAGE=<your-registry>/<project>/shagram:<tag>
 ```
 
 3) Start:
+
 ```bash
 cd deploy/shagram
 docker compose up -d --build
@@ -131,4 +134,3 @@ On the host, `restart-stacks.sh` can be used to pull and recreate:
 - The WebSocket hub is in-memory, so the app is intended to run as a single instance (no horizontal scaling).
 - Jenkins Docker agent mounts `/var/run/docker.sock`, which provides high-level control of the Docker host; use only in trusted environments.
 - Self-signed TLS is for development/demo; production should use a trusted CA (e.g., Let’s Encrypt).
-```
