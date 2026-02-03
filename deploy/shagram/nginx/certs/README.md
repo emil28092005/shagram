@@ -1,9 +1,9 @@
 # TLS Certificates for Nginx (Development / Self-Signed)
 
-In production, TLS certificates are typically issued by a trusted Certificate Authority (for example, via Let’s Encrypt).
-For local development and demo environments, a self-signed certificate can be used.
+In production, TLS certificates are typically issued by a trusted Certificate Authority (for example, via Let’s Encrypt). For local development and demo environments, a self-signed certificate can be used.
 
 ## Generate a self-signed certificate (Linux/macOS)
+
 From the repository root:
 
 ```bash
@@ -17,16 +17,21 @@ openssl req -x509 -newkey rsa:4096 \
 ```
 
 ## Verify
+
 ```bash
 openssl x509 -in deploy/shagram/nginx/certs/cert.pem -noout -text | head
 ```
 
-## Usage
-The Nginx configuration expects:
+## Expected files
+
+The Nginx configuration expects these files to exist:
+
 - `deploy/shagram/nginx/certs/cert.pem`
 - `deploy/shagram/nginx/certs/key.pem`
 
-Start the deployment:
+## Usage
+
+After generating the certificate, start the deployment:
 
 ```bash
 cd deploy/shagram
